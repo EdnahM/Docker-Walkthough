@@ -14,7 +14,7 @@ def index():
     return render_template('index.html')
 
 @app.route('/documentation')
-def index():
+def documentation():
     return render_template('dockerizedsteps.html')
 
 @app.route('/translate', methods=['POST'])

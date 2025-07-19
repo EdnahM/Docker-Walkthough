@@ -1,5 +1,7 @@
 # Dockerized English ↔ Swahili Translator -Dekut Walk Tghrough
 
+# http://localhost:5000/documentation
+
 A simple, elegant web application for translating between English and Swahili using OpenAI's GPT API. Built with Flask and designed to be easily dockerized and deployed.
 
 ## Features
@@ -191,8 +193,6 @@ docker logs translator
 ## License
 
 ## resources:
-https://claude.ai/public/artifacts/2c84c8df-68e8-40ee-9133-3b9c350afd6d
-
 https://docs.docker.com/engine/install/ubuntu/
 
 https://docker-curriculum.com/
