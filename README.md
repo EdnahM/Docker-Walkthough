@@ -206,4 +206,87 @@ Password:
 WARNING: login credentials saved in C:\Users\sven\.docker\config.json
 Login Succeeded
 ```
-   
+
+```bash  
+# 1. Clone the repository (if code is hosted remotely)
+git clone https://github.com/your-org/your-repo.git
+cd your-repo
+
+# 2. Pull the Docker image (from DockerHub or other registry)
+docker pull your-dockerhub-username/your-image-name:tag
+
+# Example:
+# docker pull mycompany/app-backend:latest
+
+# 3. Run the Docker container
+docker run -d \
+  --name your-container-name \
+  -p 8000:8000 \               # map ports (host:container)
+  -v $(pwd):/app \             # mount current dir to /app in container (optional)
+  your-dockerhub-username/your-image-name:tag
+
+# Example:
+# docker run -d --name backend-app -p 8000:8000 mycompany/app-backend:latest
+```
+
+## 🔁 Basic Cleanup Commands
+### Stop All Running Containers
+``` bash
+docker stop $(docker ps -q)
+```
+
+### Remove All Stopped Containers
+``` bash
+docker container prune -f
+```
+
+### Remove Unused Docker Images
+```bash
+docker image prune -f
+```
+
+### To remove all unused images:
+
+```bash
+docker image prune -a -f
+```
+
+### Remove Unused Networks
+``` bash
+docker network prune -f
+```
+
+### Remove Unused Volumes
+``` bash
+docker volume prune -f
+```
+
+
+
+### Full Cleanup Force Cleanup
+``` bash
+# Stop all running containers
+docker stop $(docker ps -q)
+
+# Remove all containers (running and stopped)
+docker rm -f $(docker ps -aq)
+
+# Remove all images
+docker rmi -f $(docker images -q)
+
+# Remove all volumes
+docker volume rm -f $(docker volume ls -q)
+
+# Remove all networks except default ones
+docker network rm $(docker network ls | grep "bridge\|host\|none" -v | awk '{print $1}')
+```
+
+
+### Verify Cleanup
+``` bash
+docker ps -a           # No containers
+docker images -a       # No images
+docker volume ls       # No volumes
+docker network ls      # Only default networks
+```
+
