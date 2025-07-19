@@ -13,6 +13,10 @@ openai.api_key = os.getenv('OPENAI_API_KEY')
 def index():
     return render_template('index.html')
 
+@app.route('/documentation')
+def index():
+    return render_template('dockerizedsteps.html')
+
 @app.route('/translate', methods=['POST'])
 def translate():
     try:
