@@ -1,4 +1,4 @@
-# English ↔ Swahili Translator
+# Dockerized English ↔ Swahili Translator -Dekut Walk Tghrough
 
 A simple, elegant web application for translating between English and Swahili using OpenAI's GPT API. Built with Flask and designed to be easily dockerized and deployed.
 
