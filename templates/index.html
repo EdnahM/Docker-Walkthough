@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English ↔ Swahili Translator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+        
+        .translator {
+            padding: 40px;
+        }
+        
+        .language-selector {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 30px;
+            gap: 20px;
+        }
+        
+        .lang-button {
+            padding: 12px 24px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+        
+        .lang-button.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .swap-btn {
+            background: #764ba2;
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            transition: transform 0.3s ease;
+        }
+        
+        .swap-btn:hover {
+            transform: rotate(180deg);
+        }
+        
+        .input-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .text-area {
+            position: relative;
+        }
+        
+        textarea {
+            width: 100%;
+            height: 200px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            font-size: 16px;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .char-count {
+            position: absolute;
+            bottom: 10px;
+            right: 15px;
+            color: #999;
+            font-size: 12px;
+        }
+        
+        .translate-btn {
+            display: block;
+            margin: 30px auto;
+            padding: 15px 40px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .translate-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .translate-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            color: #667eea;
+            margin: 20px 0;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error {
+            background: #ff6b6b;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .input-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .language-selector {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌍 Translator</h1>
+            <p>English ↔ Swahili Translation</p>
+        </div>
+        
+        <div class="translator">
+            <div class="language-selector">
+                <button class="lang-button active" data-direction="en-sw">English → Swahili</button>
+                <button class="swap-btn" onclick="swapLanguages()">⇄</button>
+                <button class="lang-button" data-direction="sw-en">Swahili → English</button>
+            </div>
+            
+            <div class="input-section">
+                <div class="text-area">
+                    <textarea 
+                        id="inputText" 
+                        placeholder="Enter text to translate..."
+                        maxlength="500"
+                        oninput="updateCharCount()"></textarea>
+                    <div class="char-count">
+                        <span id="charCount">0</span>/500
+                    </div>
+                </div>
+                
+                <div class="text-area">
+                    <textarea 
+                        id="outputText" 
+                        placeholder="Translation will appear here..."
+                        readonly></textarea>
+                </div>
+            </div>
+            
+            <button class="translate-btn" onclick="translateText()">
+                Translate
+            </button>
+            
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Translating...</p>
+            </div>
+            
+            <div class="error" id="error"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentDirection = 'en-sw';
+        
+        // Language selector functionality
+        document.querySelectorAll('.lang-button').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.lang-button').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentDirection = this.dataset.direction;
+                updatePlaceholders();
+            });
+        });
+        
+        function swapLanguages() {
+            const currentActive = document.querySelector('.lang-button.active');
+            const otherButton = document.querySelector('.lang-button:not(.active)');
+            
+            currentActive.classList.remove('active');
+            otherButton.classList.add('active');
+            
+            currentDirection = otherButton.dataset.direction;
+            
+            // Swap text content
+            const input = document.getElementById('inputText');
+            const output = document.getElementById('outputText');
+            const temp = input.value;
+            input.value = output.value;
+            output.value = temp;
+            
+            updatePlaceholders();
+            updateCharCount();
+        }
+        
+        function updatePlaceholders() {
+            const input = document.getElementById('inputText');
+            if (currentDirection === 'en-sw') {
+                input.placeholder = 'Enter English text to translate...';
+            } else {
+                input.placeholder = 'Ingiza maandishi ya Kiswahili kutafsiri...';
+            }
+        }
+        
+        function updateCharCount() {
+            const input = document.getElementById('inputText');
+            const count = document.getElementById('charCount');
+            count.textContent = input.value.length;
+        }
+        
+        async function translateText() {
+            const inputText = document.getElementById('inputText').value.trim();
+            const outputText = document.getElementById('outputText');
+            const loading = document.getElementById('loading');
+            const error = document.getElementById('error');
+            const translateBtn = document.querySelector('.translate-btn');
+            
+            if (!inputText) {
+                showError('Please enter text to translate');
+                return;
+            }
+            
+            // Show loading state
+            loading.style.display = 'block';
+            translateBtn.disabled = true;
+            error.style.display = 'none';
+            outputText.value = '';
+            
+            try {
+                const [sourceLang, targetLang] = currentDirection.split('-');
+                
+                const response = await fetch('/translate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        text: inputText,
+                        source_lang: sourceLang,
+                        target_lang: targetLang
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'Translation failed');
+                }
+                
+                outputText.value = data.translation;
+                
+            } catch (err) {
+                showError(`Translation error: ${err.message}`);
+            } finally {
+                loading.style.display = 'none';
+                translateBtn.disabled = false;
+            }
+        }
+        
+        function showError(message) {
+            const error = document.getElementById('error');
+            error.textContent = message;
+            error.style.display = 'block';
+            setTimeout(() => {
+                error.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Allow Enter to translate (Ctrl+Enter for new line)
+        document.getElementById('inputText').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.ctrlKey) {
+                e.preventDefault();
+                translateText();
+            }
+        });
+    </script>
+</body>
+</html>
